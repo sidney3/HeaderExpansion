@@ -18,6 +18,6 @@ def get_file_dependencies(root_path: str, file_path: str) -> List[str]:
         s:str = file.read()
         return re.findall(INCLUDE_REGEX, s)
 
-if __name__ == "__main__":
-    print(get_file_dependencies("/Users/sidneylevine/personal/ws/HeaderExpansion/src/modules", "test.cpp"))
+# if __name__ == "__main__":
+#     print(get_file_dependencies("/Users/sidneylevine/personal/ws/HeaderExpansion/src/modules", "test.cpp"))
 
