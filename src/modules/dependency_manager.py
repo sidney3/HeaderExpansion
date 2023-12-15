@@ -14,18 +14,26 @@ class dependency_manager:
         indirect_file_depenencies: Iterable[str] = get_required_components(dir_graph, direct_file_dependencies)
         self.dependencies: Iterable[str] = self.__merge(direct_file_dependencies, indirect_file_depenencies)
         self.dir_components: Iterable[str] = get_files(target_dir)
-    def get_internal_dependencies(self) -> Iterable[str]:
+    def __get_internal_dependencies(self) -> Iterable[str]:
         """
         Returns a list of the paths to the dependencies for the target_file
         that are inside the target directory
         """
         return [dependency for dependency in self.dependencies if dependency in self.dir_components]
-    def get_external_dependencies(self) -> Iterable[str]:
+    def __get_external_dependencies(self) -> Iterable[str]:
         """
         Returns a list of the dependencies (including sub-dependencies) that are
         dependencies to the file and are outside the target directory (e.x #include <vector>)
         """
         return [dependency for dependency in self.dependencies if dependency not in self.dir_components]
+    def get_full_header(self) -> str:
+        top_header: str = "#pragma once\n"
+        includes: str = "\n".join([self.get_include(inc) for inc in self.__get_external_dependencies()])
+        import_bodies: str = "\n".join([get_file_body(dep_path) for dep_path in self.__get_internal_dependencies()])
+        return "\n".join([top_header, includes, import_bodies]) + "\n"
+
+    def get_include(self, dependency: Iterable[str]) -> str:
+        return f"#include <{dependency}>"
     def __merge(self, C1: Iterable[str], C2: Iterable[str]) -> Iterable[str]:
         """
         Merge two iterables, with the elements in the first getting placed before the second

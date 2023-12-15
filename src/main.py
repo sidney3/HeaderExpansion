@@ -13,22 +13,11 @@ def main():
     root_dir, target_file = sys.argv
     validate_arguments(root_dir, target_file)
     dependency_state = dependency_manager(root_dir, target_file)
+    target_file_header: str = dependency_state.get_full_header()
+    target_file_body: str = get_file_body(target_file)
+    new_file:str = target_file_header + target_file_body
     with open(target_file, "w") as destination_file:
-        destination_file.write(get_built_file(dependency_state, target_file, root_dir))
-
-def get_built_file(dep_manager, target_file, root_dir) -> str:
-    """
-    Merge the file, root_dir pair given by dep_manager into a single file
-    """
-    top_header: str = f"#pragma once\n"
-    includes: str = "\n".join([get_include(inc) for inc in dep_manager.get_external_dependencies()])
-    import_bodies: str = "\n".join([get_file_body(dep_path) for dep_path in dep_manager.get_internal_dependencies()])
-    base_body: str = get_file_body(target_file)
-    return "\n".join([top_header, includes, import_bodies, base_body])
-
-def get_include(dependency: Iterable[str]) -> str:
-    return f"#include <{dependency}>"
-
+        destination_file.write(new_file)
 
 if __name__ == "__main__":
     main()
