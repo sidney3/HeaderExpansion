@@ -1,4 +1,4 @@
 from typing import List
-def validate_args():
+def validate_arguments(root_dir, target_file):
     pass
 
