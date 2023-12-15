@@ -1,7 +1,19 @@
 from typing import Dict, Collection, DefaultDict, TypeVar, Iterable, List, Set
 from collections import defaultdict
-
+"""
+GRAPH RELATED UTILITY FUNCTIONS.
+"""
 T = TypeVar('T')
+def get_external_nodes(graph: Dict[T, Collection[T]]) -> Collection[T]:
+    """
+    Given a graph, returns a collection of all leaf nodes (nodes not mapping
+    to any values).
+    """
+    external_nodes: Set[T] = set()
+    for mapping in graph.values():
+        for node in mapping:
+            external_nodes.add(node)
+    return external_nodes
 def get_required_components(graph: Dict[T, Collection[T]], base: Collection[T]) -> Collection[T]:
     """
     Given a graph and a subset of nodes from the graph, returns all nodes reachable from these
@@ -10,7 +22,7 @@ def get_required_components(graph: Dict[T, Collection[T]], base: Collection[T]) 
     Throws:
         Exception (Cyclic Dependencies): the graph must be a directed acyclic graph
     """
-    node_order: dict[T, int] = topo_sort(graph)
+    node_order: dict[T, int] = __topo_sort(graph)
     visited: Set[T] = set()
     def dfs(curr_node: T):
         if curr_node in visited or curr_node not in graph:
@@ -21,12 +33,12 @@ def get_required_components(graph: Dict[T, Collection[T]], base: Collection[T]) 
     for node in base:
         dfs(node)
     return sorted(visited, key = lambda node: node_order[node])
-def topo_sort(graph: Dict[T, Collection[T]]) -> Dict[T, int]:
+def __topo_sort(graph: Dict[T, Collection[T]]) -> Dict[T, int]:
     """
     Given an arbitrary graph, returns a topological sorting of its
     components that is given by a dictionary from node to its order
     """
-    if check_cycles(graph):
+    if __check_cycles(graph):
         raise Exception("Cyclic Dependencies")
     sorted_components: List[T] = [] 
     visited: Set[T] = set()
@@ -39,7 +51,7 @@ def topo_sort(graph: Dict[T, Collection[T]]) -> Dict[T, int]:
     for node in graph:
         topo(node)
     return {comp: order for order, comp in enumerate(reversed(sorted_components))}
-def check_cycles(graph: Dict[T, Collection[T]]) -> bool:
+def __check_cycles(graph: Dict[T, Collection[T]]) -> bool:
     """
     Given an arbitrary directed graph, checks for cycles
     """
@@ -62,3 +74,4 @@ def check_cycles(graph: Dict[T, Collection[T]]) -> bool:
     for node in graph:
         is_cycle = is_cycle or dfs(node)
     return is_cycle
+

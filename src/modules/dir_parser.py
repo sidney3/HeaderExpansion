@@ -1,6 +1,7 @@
 from typing import Dict, Collection, List
-from . import file_parser 
+from modules import file_parser 
 import os
+import re
 
 def get_directory_graph(root_path: str) -> Dict[str, Collection[str]]:
     """
@@ -13,9 +14,9 @@ def get_directory_graph(root_path: str) -> Dict[str, Collection[str]]:
     Throws:
         Error if there are cyclic dependencies
     """
-    return {file: file_parser.get_file_dependencies(root_path, file) \
-            for file in get_files(root_path) if is_file_extension(file, ".cpp")}
-def get_files(root_path: str, relative_path: str = "") -> List[str]:
+    return {file: file_parser.get_file_dependencies(os.path.join(root_path, file)) \
+            for file in __get_files(root_path) if __is_file_extension(file, ".cpp")}
+def __get_files(root_path: str, relative_path: str = "") -> List[str]:
     """
     given a filepath to a root directory, and a relative path to this
     root directory, returns a list of the files (recursively) inside the root_path
@@ -28,11 +29,11 @@ def get_files(root_path: str, relative_path: str = "") -> List[str]:
             if os.path.isfile(full_path):
                 dir_files.append(os.path.join(relative_path, item))
             else:
-                dir_files += get_files(root_path, os.path.join(relative_path, item))
+                dir_files += __get_files(root_path, os.path.join(relative_path, item))
     except OSError as e:
         print(f"Error accessing {root_path}: {e}")
     return dir_files 
-def is_file_extension(file_path, extension):
+def __is_file_extension(file_path, extension):
     """
     Check if the file at file_path has the given extension.
     Extension should start with a dot, e.g., '.txt', '.jpg'.
