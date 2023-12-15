@@ -4,16 +4,6 @@ from collections import defaultdict
 GRAPH RELATED UTILITY FUNCTIONS.
 """
 T = TypeVar('T')
-def get_external_nodes(graph: Dict[T, Collection[T]]) -> Collection[T]:
-    """
-    Given a graph, returns a collection of all leaf nodes (nodes not mapping
-    to any values).
-    """
-    external_nodes: Set[T] = set()
-    for mapping in graph.values():
-        for node in mapping:
-            external_nodes.add(node)
-    return external_nodes
 def get_required_components(graph: Dict[T, Collection[T]], base: Collection[T]) -> Collection[T]:
     """
     Given a graph and a subset of nodes from the graph, returns all nodes reachable from these
@@ -25,7 +15,7 @@ def get_required_components(graph: Dict[T, Collection[T]], base: Collection[T]) 
     node_order: dict[T, int] = __topo_sort(graph)
     visited: Set[T] = set()
     def dfs(curr_node: T):
-        if curr_node in visited or curr_node not in graph:
+        if curr_node in visited:
             return
         visited.add(curr_node)
         for next_node in graph[curr_node]:
@@ -43,7 +33,7 @@ def __topo_sort(graph: Dict[T, Collection[T]]) -> Dict[T, int]:
     sorted_components: List[T] = [] 
     visited: Set[T] = set()
     def topo(curr_node: T):
-        if curr_node in visited or curr_node not in graph:
+        if curr_node in visited:
             return
         for next_node in graph[curr_node]:
             topo(next_node)
@@ -58,8 +48,6 @@ def __check_cycles(graph: Dict[T, Collection[T]]) -> bool:
     UNVISITED, VISITING, VISITED = 0,1,2
     graph_state: DefaultDict[T, int] = defaultdict(lambda: UNVISITED)
     def dfs(curr_node: T):
-        if curr_node not in graph:
-            return False
         if(graph_state[curr_node] == VISITED):
             return False
         if(graph_state[curr_node] == VISITING):
