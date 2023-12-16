@@ -4,7 +4,7 @@ from collections import defaultdict
 GRAPH RELATED UTILITY FUNCTIONS.
 """
 T = TypeVar('T')
-def get_required_components(graph: Dict[T, Collection[T]], base: Collection[T]) -> Collection[T]:
+def get_required_components(dependency_graph: Dict[T, Collection[T]], module_graph: Dict[T, Collection[T]], base: Collection[T]) -> Collection[T]:
     """
     Given a graph and a subset of nodes from the graph, returns all nodes reachable from these
     nodes, sorted in proper ordering
@@ -12,22 +12,21 @@ def get_required_components(graph: Dict[T, Collection[T]], base: Collection[T]) 
     Throws:
         Exception (Cyclic Dependencies): the graph must be a directed acyclic graph
     """
-    node_order: dict[T, int] = __topo_sort(graph)
+    node_order: dict[T, int] = __topo_sort(dependency_graph)
+    res = sorted(__unfold_set(module_graph, base), key = lambda node: node_order.get(node, 0))
+    return res
+def __unfold_set(graph: Dict[T, Collection[T]], base: Collection[T]) -> Collection[T]:
+
     visited: Set[T] = set()
     def dfs(curr_node: T):
         if curr_node in visited:
             return
         visited.add(curr_node)
-        for next_node in graph[curr_node]:
+        for next_node in graph.get(curr_node, []):
             dfs(next_node)
     for node in base:
-        if node in graph:
-            dfs(node)
-        else:
-            print("NODE NOT FOUND: ", node)
-    res = sorted(visited, key = lambda node: node_order[node])
-    print("SORTED REQUIRED COMPONENTS", list(res))
-    return res
+        dfs(node)
+    return visited
 def __topo_sort(graph: Dict[T, Collection[T]]) -> Dict[T, int]:
     """
     Given an arbitrary graph, returns a topological sorting of its

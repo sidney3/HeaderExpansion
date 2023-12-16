@@ -3,17 +3,11 @@ from modules import file_parser
 import os
 import re
 
-def get_directory_graph(root_path: str) -> Dict[str, Collection[str]]:
+def get_dependency_graph(root_path: str) -> Dict[str, Collection[str]]:
     """
-    Given a filepath a directory, returns a graph representing the dependency tree of the files
-    within that directory. 
-    Returns:
-        Dict[str, List[str]]: A graph from filenames, each pathed relative to
-        the root directory, to their dependencies. Note that we consider external dependencies
-        (like <vector>) as leaf nodes that don't depend on any values.
+    Given a filepath to a directory, returns a graph with
 
-    Throws:
-        Error if there are cyclic dependencies
+    (filepath) -> the components (filepath) depends on
     """
     dependencies: Dict[str, Collection[str]] = {}
     for file in get_files(root_path):
@@ -24,6 +18,14 @@ def get_directory_graph(root_path: str) -> Dict[str, Collection[str]]:
         for dependency in file_parser.get_file_dependencies(os.path.join(root_path, file)):
             dependencies[dependency] = __merge([file], dependencies.get(dependency, []))
     return dependencies
+def get_module_graph(root_path: str) -> Dict[str, Collection[str]]:
+    """
+    Given a filepath to a directory, returns a graph with
+
+    (filepath) -> the components FOR WHICH (filepath) is a dependency
+    """
+    dependencies: Dict[str, Collection[str]] = {}
+    return {file: file_parser.get_file_dependencies(os.path.join(root_path,file)) for file in get_files(root_path) if __is_file_extension(file, ".cpp") or __is_file_extension(file, ".cc")}
 def get_files(root_path: str, relative_path: str = "") -> Collection[str]:
     """
     given a filepath to a root directory, and a relative path to this
@@ -55,7 +57,3 @@ def __merge(c1: Collection[str], c2: Collection[str]) -> Collection[str]:
     for c in c2:
         merged.append(c)
     return merged
-
-if __name__ == "__main__":
-    pwd = '/Users/sidneylevine/personal/ws/HeaderExpansion/src'
-    get_directory_graph(pwd)

@@ -2,7 +2,6 @@ from typing import Collection
 import re
 import os
 
-INCLUDE_REGEX = "#[\\s]*include[\\s]*<([^>]+)>" 
 
 def get_file_dependencies(file_path: str) -> Collection[str]:
     """
@@ -14,6 +13,7 @@ def get_file_dependencies(file_path: str) -> Collection[str]:
     Returns:
         List[str]: List of file path dependencies
     """
+    INCLUDE_REGEX = "#[\\s]*include[\\s]*<([^>]+)>" 
     with open(file_path, "r") as file:
         return re.findall(INCLUDE_REGEX, file.read())
 

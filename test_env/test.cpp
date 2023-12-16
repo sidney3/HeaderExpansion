@@ -1,40 +1,9 @@
 #pragma once
 
 #include <vector>
-
-class DoMoreStuff
-{
-    DoMoreStuff()
-    {
-        cout << "Hello world\n";
-        cout << 23 * 5 << "\n";
-    }
-}
-
-
-class do_stuff
-{
-public:
-    do_stuff()
-    {
-        cout << "Stuff is getting done\n";
-    }
-}
-int tester()
-{
-    cout << "Hello world";
-}
-
-
-int main()
-{
-    for(int i = 0; i < 6; i++)
-    {
-        cout << "This is a file that does things\n";
-    }
-}
-
-
+#include <sub_dir/sub_sub_dir/dependency2.cpp>
+#include <main.cpp>
+#include <sub_dir/dependency1.cpp>
 
 int main()
 {

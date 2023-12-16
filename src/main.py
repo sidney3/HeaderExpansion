@@ -16,7 +16,6 @@ def main():
     target_file_header: str = dependency_state.get_full_header()
     target_file_body: str = get_file_body(target_file)
     new_file:str = target_file_header + target_file_body
-    print("NEW FILE CONTENTS\n", new_file)
     with open(target_file, "w") as destination_file:
         destination_file.write(new_file)
 

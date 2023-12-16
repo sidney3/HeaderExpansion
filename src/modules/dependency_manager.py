@@ -1,5 +1,5 @@
 import os
-from modules.dir_parser import get_directory_graph, get_files
+from modules.dir_parser import get_dependency_graph, get_module_graph, get_files
 from modules.validate_arguments import validate_arguments
 from modules.file_parser import get_file_dependencies, get_file_body
 from modules.graph_util import  get_required_components 
@@ -12,14 +12,11 @@ class dependency_manager:
     def __init__(self, target_dir: str, target_file: str):
         self.target_dir = target_dir
 
-        dir_graph: Dict[str, Collection[str]] = get_directory_graph(target_dir)
-        print("dir_graph", dir_graph)
+        dependency_graph: Dict[str, Collection[str]] = get_dependency_graph(target_dir)
+        module_graph: Dict[str, Collection[str]] = get_module_graph(target_dir)
         file_dependencies: Iterable[str] = get_file_dependencies(target_file)
-        direct_file_dependencies: Iterable[str] = [dep for dep in file_dependencies if dep not in dir_graph]
-        print("direct dependencies",direct_file_dependencies)
-        indirect_file_depenencies: Iterable[str] = get_required_components(dir_graph, file_dependencies)
-        print("indirect dependencies: ", indirect_file_depenencies)
-        self.dependencies: Iterable[str] = self.__merge(direct_file_dependencies, indirect_file_depenencies)
+        self.dependencies: Iterable[str] = get_required_components(dependency_graph, module_graph, file_dependencies)
+
         self.dir_components: Iterable[str] = get_files(target_dir)
     def __get_internal_dependencies(self) -> Iterable[str]:
         """
@@ -36,19 +33,8 @@ class dependency_manager:
     def get_full_header(self) -> str:
         top_header: str = "#pragma once\n"
         includes: str = "\n".join([self.get_include(inc) for inc in self.__get_external_dependencies()])
-        print("TARGET DIRECTORY", self.target_dir)
         import_bodies: str = "\n".join([ get_file_body(os.path.join(self.target_dir, dep_path)) for dep_path in self.__get_internal_dependencies()])
         return "\n".join([top_header, includes, import_bodies]) + "\n"
 
     def get_include(self, dependency: Iterable[str]) -> str:
         return f"#include <{dependency}>"
-    def __merge(self, C1: Iterable[str], C2: Iterable[str]) -> Iterable[str]:
-        """
-        Merge two iterables, with the elements in the first getting placed before the second
-        """
-        merged: List[str] = []
-        for c in C1:
-            merged.append(c)
-        for c in C2:
-            merged.append(c)
-        return merged

@@ -27,11 +27,11 @@ def test_dependency_list():
     neighboring_directory_name = "test_dir"
     neighboring_directory_path = os.path.join(parent_directory, neighboring_directory_name)
 
-    test_dir_graph = dir_parser.get_directory_graph(neighboring_directory_path)
-    assert(len(test_dir_graph) == len(expected_dir_graph))
+    test_module_graph = dir_parser.get_module_graph(neighboring_directory_path)
+    assert(len(test_module_graph) == len(expected_dir_graph))
     for item in expected_dir_graph:
-        assert(item in test_dir_graph)
-        assert(collection_equality(test_dir_graph[item], expected_dir_graph[item]))
+        assert(item in test_module_graph)
+        assert(collection_equality(test_module_graph[item], expected_dir_graph[item]))
 
 if __name__ == "__main__":
     test_dependency_list()
