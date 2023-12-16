@@ -31,10 +31,9 @@ class dependency_manager:
         """
         return [dependency for dependency in self.dependencies if dependency not in self.dir_components]
     def get_full_header(self) -> str:
-        top_header: str = "#pragma once\n"
         includes: str = "\n".join([self.get_include(inc) for inc in self.__get_external_dependencies()])
         import_bodies: str = "\n".join([ get_file_body(os.path.join(self.target_dir, dep_path)) for dep_path in self.__get_internal_dependencies()])
-        return "\n".join([top_header, includes, import_bodies]) + "\n"
+        return "\n".join([includes, import_bodies]) + "\n"
 
     def get_include(self, dependency: Iterable[str]) -> str:
         return f"#include <{dependency}>"
