@@ -1,3 +1,4 @@
+import os
 from modules.dir_parser import get_directory_graph, get_files
 from modules.validate_arguments import validate_arguments
 from modules.file_parser import get_file_dependencies, get_file_body
@@ -9,9 +10,15 @@ class dependency_manager:
     directory.
     """
     def __init__(self, target_dir: str, target_file: str):
+        self.target_dir = target_dir
+
         dir_graph: Dict[str, Collection[str]] = get_directory_graph(target_dir)
-        direct_file_dependencies: Iterable[str] = {dep for dep in get_file_dependencies(target_file) if dep not in dir_graph}
-        indirect_file_depenencies: Iterable[str] = get_required_components(dir_graph, direct_file_dependencies)
+        print("dir_graph", dir_graph)
+        file_dependencies: Iterable[str] = get_file_dependencies(target_file)
+        direct_file_dependencies: Iterable[str] = [dep for dep in file_dependencies if dep not in dir_graph]
+        print("direct dependencies",direct_file_dependencies)
+        indirect_file_depenencies: Iterable[str] = get_required_components(dir_graph, file_dependencies)
+        print("indirect dependencies: ", indirect_file_depenencies)
         self.dependencies: Iterable[str] = self.__merge(direct_file_dependencies, indirect_file_depenencies)
         self.dir_components: Iterable[str] = get_files(target_dir)
     def __get_internal_dependencies(self) -> Iterable[str]:
@@ -29,7 +36,8 @@ class dependency_manager:
     def get_full_header(self) -> str:
         top_header: str = "#pragma once\n"
         includes: str = "\n".join([self.get_include(inc) for inc in self.__get_external_dependencies()])
-        import_bodies: str = "\n".join([get_file_body(dep_path) for dep_path in self.__get_internal_dependencies()])
+        print("TARGET DIRECTORY", self.target_dir)
+        import_bodies: str = "\n".join([ get_file_body(os.path.join(self.target_dir, dep_path)) for dep_path in self.__get_internal_dependencies()])
         return "\n".join([top_header, includes, import_bodies]) + "\n"
 
     def get_include(self, dependency: Iterable[str]) -> str:

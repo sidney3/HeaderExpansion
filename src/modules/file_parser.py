@@ -27,5 +27,6 @@ def get_file_body(file_path: str) -> str:
     Returns:
         str: The body (components minus import statements) of the file
     """
+    BODY_REGEX = "#[^\n]*\n" 
     with open(file_path, "r") as file:
-        return re.sub(INCLUDE_REGEX, '', file.read())
+        return re.sub(BODY_REGEX, '', file.read())

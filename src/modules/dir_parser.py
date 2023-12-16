@@ -15,14 +15,15 @@ def get_directory_graph(root_path: str) -> Dict[str, Collection[str]]:
     Throws:
         Error if there are cyclic dependencies
     """
-    local_dependencies: Dict[str, Collection[str]] = {file: file_parser.get_file_dependencies(os.path.join(root_path, file)) \
-            for file in get_files(root_path) if __is_file_extension(file, ".cpp")}
-    nonlocal_dependencies: Dict[str, Collection[str]] = {}
-    for dep_collection in local_dependencies.values():
-        for dep in dep_collection:
-            if dep not in local_dependencies and dep not in nonlocal_dependencies:
-                nonlocal_dependencies[dep] = []
-    return (local_dependencies | nonlocal_dependencies)
+    dependencies: Dict[str, Collection[str]] = {}
+    for file in get_files(root_path):
+        if file not in dependencies:
+            dependencies[file] = []
+        if not (__is_file_extension(file, ".cpp") or __is_file_extension(file, ".cc")):
+            continue
+        for dependency in file_parser.get_file_dependencies(os.path.join(root_path, file)):
+            dependencies[dependency] = __merge([file], dependencies.get(dependency, []))
+    return dependencies
 def get_files(root_path: str, relative_path: str = "") -> Collection[str]:
     """
     given a filepath to a root directory, and a relative path to this
@@ -47,7 +48,13 @@ def __is_file_extension(file_path, extension):
     """
     _, file_ext = os.path.splitext(file_path)
     return file_ext.lower() == extension.lower()
-
+def __merge(c1: Collection[str], c2: Collection[str]) -> Collection[str]:
+    merged: List[str] = []
+    for c in c1:
+        merged.append(c)
+    for c in c2:
+        merged.append(c)
+    return merged
 
 if __name__ == "__main__":
     pwd = '/Users/sidneylevine/personal/ws/HeaderExpansion/src'

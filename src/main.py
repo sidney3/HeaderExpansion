@@ -8,14 +8,15 @@ from typing import List, Collection, Dict, Iterable
 NUM_ARGS = 2
 
 def main():
-    if(len(sys.argv) != 2):
+    if(len(sys.argv) != 3):
         raise Exception("expected 2 arguments")
-    root_dir, target_file = sys.argv
+    _, root_dir, target_file = sys.argv
     validate_arguments(root_dir, target_file)
     dependency_state = dependency_manager(root_dir, target_file)
     target_file_header: str = dependency_state.get_full_header()
     target_file_body: str = get_file_body(target_file)
     new_file:str = target_file_header + target_file_body
+    print("NEW FILE CONTENTS\n", new_file)
     with open(target_file, "w") as destination_file:
         destination_file.write(new_file)
 

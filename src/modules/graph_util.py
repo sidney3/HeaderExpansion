@@ -21,8 +21,13 @@ def get_required_components(graph: Dict[T, Collection[T]], base: Collection[T]) 
         for next_node in graph[curr_node]:
             dfs(next_node)
     for node in base:
-        dfs(node)
-    return sorted(visited, key = lambda node: node_order[node])
+        if node in graph:
+            dfs(node)
+        else:
+            print("NODE NOT FOUND: ", node)
+    res = sorted(visited, key = lambda node: node_order[node])
+    print("SORTED REQUIRED COMPONENTS", list(res))
+    return res
 def __topo_sort(graph: Dict[T, Collection[T]]) -> Dict[T, int]:
     """
     Given an arbitrary graph, returns a topological sorting of its
