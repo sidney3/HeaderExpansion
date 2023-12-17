@@ -10,6 +10,10 @@ Python3 <path to HeaderExpansion/src/main.py> <path to template_directory> <path
 
 Will expand any of these include statements recursively. This allows you to build a library of template components, with nested dependencies, and access them quickly for competitive programming.
 
+## Why use the tool?
+
+Why use this tool over a large snippets library? This allows you to nest dependencies (i.e. have one template component that includes another) without having to copy paste the required module. Moreover, if you want to write tests for your template library, as you should, this is difficult if you are using snippets. This tool allows you to write comprehensive competitive programming libraries like a __Software Engineer__.
+
 ## Suggested Use
 
 As the location of this directory and the location of your template directory will be static, this tool is intended to be used with the following style of command mapping.
